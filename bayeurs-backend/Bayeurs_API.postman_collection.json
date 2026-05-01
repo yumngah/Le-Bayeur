@@ -1,0 +1,235 @@
+{
+	"info": {
+		"_postman_id": "bayeurs-api-collection-v2",
+		"name": "Bayeurs API Complete",
+		"description": "Full API collection for Bayeurs Real Estate Platform including Auth, Properties, Leases, Payments, Maintenance, Chat, and Bills.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{ 
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"johndoe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+237600000000\",\n    \"password\": \"Password123!\",\n    \"role\": \"TENANT\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/auth/signup", "host": ["{{base_url}}"], "path": ["auth", "signup"] }
+					}
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.accessToken) {",
+									"    pm.environment.set(\"token\", jsonData.accessToken);",
+									"    pm.environment.set(\"user_id\", jsonData.user.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"Password123!\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/auth/login", "host": ["{{base_url}}"], "path": ["auth", "login"] }
+					}
+				},
+				{
+					"name": "Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"code\": \"123456\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/auth/verify-email", "host": ["{{base_url}}"], "path": ["auth", "verify-email"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Properties",
+			"item": [
+				{
+					"name": "Create Property",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Appartement de Luxe\",\n    \"description\": \"3 chambres, 2 douches\",\n    \"location\": \"Douala, Bonapriso\",\n    \"price\": 350000,\n    \"type\": \"APARTMENT\",\n    \"status\": \"FOR_RENT\",\n    \"standing\": \"HIGH\",\n    \"features\": [\"Parking\", \"Wifi\"]\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/properties", "host": ["{{base_url}}"], "path": ["properties"] }
+					}
+				},
+				{
+					"name": "Get All (Filters)",
+					"request": {
+						"method": "GET",
+						"url": { "raw": "{{base_url}}/properties?minPrice=200000&type=APARTMENT", "host": ["{{base_url}}"], "path": ["properties"], "query": [{"key": "minPrice", "value": "200000"}, {"key": "type", "value": "APARTMENT"}] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Leases & Payments",
+			"item": [
+				{
+					"name": "Create Lease",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"property_id\": \"{{prop_id}}\",\n    \"tenant_id\": \"{{tenant_id}}\",\n    \"monthly_rent\": 250000,\n    \"start_date\": \"2026-05-01\",\n    \"end_date\": \"2027-05-01\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/leases", "host": ["{{base_url}}"], "path": ["leases"] }
+					}
+				},
+				{
+					"name": "Sign Lease (Tenant)",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"role\": \"tenant\",\n    \"signature\": \"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/leases/{{lease_id}}/sign", "host": ["{{base_url}}"], "path": ["leases", "{{lease_id}}", "sign"] }
+					}
+				},
+				{
+					"name": "Create Payment",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"lease_id\": \"{{lease_id}}\",\n    \"amount\": 250000,\n    \"period_start\": \"2026-05-01\",\n    \"period_end\": \"2026-05-31\",\n    \"payment_method\": \"MOBILE_MONEY\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/payments", "host": ["{{base_url}}"], "path": ["payments"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Maintenance",
+			"item": [
+				{
+					"name": "Register Technician",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"specialty\": \"ELECTRICITY\",\n    \"bio\": \"Electricien agréé\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/maintenance/technicians/register", "host": ["{{base_url}}"], "path": ["maintenance", "technicians", "register"] }
+					}
+				},
+				{
+					"name": "Create Repair Request",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"property_id\": \"{{prop_id}}\",\n    \"description\": \"Fuite d'eau dans la cuisine\",\n    \"urgency\": \"HIGH\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/maintenance/requests", "host": ["{{base_url}}"], "path": ["maintenance", "requests"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Social (Chat & Comments)",
+			"item": [
+				{
+					"name": "Send Message",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"receiver_id\": \"{{other_user_id}}\",\n    \"content\": \"Bonjour, est-ce toujours disponible ?\",\n    \"property_id\": \"{{prop_id}}\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/messages", "host": ["{{base_url}}"], "path": ["messages"] }
+					}
+				},
+				{
+					"name": "Post Comment",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"property_id\": \"{{prop_id}}\",\n    \"content\": \"Excellent emplacement !\",\n    \"rating\": 5\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/comments", "host": ["{{base_url}}"], "path": ["comments"] }
+					}
+				}
+			]
+		},
+		{
+			"name": "Bills",
+			"item": [
+				{
+					"name": "Create Bill",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "POST",
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"WATER\",\n    \"amount\": 8500,\n    \"due_date\": \"2026-06-15\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": { "raw": "{{base_url}}/bills", "host": ["{{base_url}}"], "path": ["bills"] }
+					}
+				},
+				{
+					"name": "Mark as Paid",
+					"request": {
+						"auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }] },
+						"method": "PATCH",
+						"url": { "raw": "{{base_url}}/bills/{{bill_id}}/paid", "host": ["{{base_url}}"], "path": ["bills", "{{bill_id}}", "paid"] }
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{ "key": "base_url", "value": "http://localhost:5000/api", "type": "string" },
+		{ "key": "token", "value": "", "type": "string" },
+		{ "key": "user_id", "value": "", "type": "string" },
+		{ "key": "prop_id", "value": "", "type": "string" },
+		{ "key": "lease_id", "value": "", "type": "string" },
+		{ "key": "bill_id", "value": "", "type": "string" }
+	]
+}
