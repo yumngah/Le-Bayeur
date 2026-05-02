@@ -52,74 +52,122 @@ class _VerificationScreenState extends ConsumerState<VerificationScreen> {
   Widget build(BuildContext context) {
     final defaultPinTheme = PinTheme(
       width: 56,
-      height: 56,
-      textStyle: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.black),
+      height: 64,
+      textStyle: GoogleFonts.plusJakartaSans(fontSize: 24, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!),
+        color: const Color(0xFFF8F9FB),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[200]!),
       ),
     );
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(backgroundColor: Colors.white, elevation: 0, leading: BackButton(color: Colors.black)),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              "Vérification ${widget.type == 'email' ? 'Email' : 'Mobile'}",
-              style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              "Nous avons envoyé un code à 6 chiffres à votre ${widget.type == 'email' ? 'adresse email' : 'numéro de téléphone'}.",
-              style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[600]),
-            ),
-            const SizedBox(height: 48),
-            
-            Pinput(
-              length: 6,
-              defaultPinTheme: defaultPinTheme,
-              focusedPinTheme: defaultPinTheme.copyWith(
-                decoration: defaultPinTheme.decoration!.copyWith(border: Border.all(color: Colors.blue)),
+      appBar: AppBar(
+        backgroundColor: Colors.white, 
+        elevation: 0, 
+        leading: const BackButton(color: Colors.black)
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                "Vérification ${widget.type == 'email' ? 'Email' : 'Mobile'}",
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 28, 
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF1A1C1E),
+                  letterSpacing: -0.5,
+                ),
               ),
-              onCompleted: (pin) {
-                if (widget.type == 'email') {
-                  ref.read(authProvider.notifier).verifyEmail(pin);
-                }
-              },
-            ),
+              const SizedBox(height: 12),
+              Text(
+                "Nous avons envoyé un code à 6 chiffres à votre ${widget.type == 'email' ? 'adresse email' : 'numéro de téléphone'}.",
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 16, 
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 48),
+              
+              Center(
+                child: Pinput(
+                  length: 6,
+                  defaultPinTheme: defaultPinTheme,
+                  focusedPinTheme: defaultPinTheme.copyWith(
+                    decoration: defaultPinTheme.decoration!.copyWith(
+                      border: Border.all(color: Colors.blue[600]!, width: 2),
+                      color: Colors.white,
+                    ),
+                  ),
+                  onCompleted: (pin) {
+                    if (widget.type == 'email') {
+                      ref.read(authProvider.notifier).verifyEmail(pin);
+                    }
+                  },
+                ),
+              ),
 
-            const SizedBox(height: 32),
-            Text(
-              "Le code expire dans $_timerText",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[700], fontWeight: FontWeight.w600),
-            ),
-            
-            const Spacer(),
-            
-            TextButton(
-              onPressed: _canResend ? () {} : null,
-              child: Text(
-                _canResend ? "Renvoyer le code" : "Renvoyer dans ${_resendDelay}s",
-                style: GoogleFonts.inter(color: _canResend ? Colors.blue : Colors.grey),
+              const SizedBox(height: 40),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.timer_outlined, size: 18, color: Colors.blue[700]),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Le code expire dans $_timerText",
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14, 
+                        color: Colors.blue[700], 
+                        fontWeight: FontWeight.w700
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+              
+              const Spacer(),
+              
+              TextButton(
+                onPressed: _canResend ? () {} : null,
+                style: TextButton.styleFrom(padding: const EdgeInsets.all(16)),
+                child: Text(
+                  _canResend ? "Renvoyer le code" : "Renvoyer dans ${_resendDelay}s",
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.w700,
+                    color: _canResend ? Colors.blue[600] : Colors.grey[400],
+                  ),
+                ),
+              ),
 
-            ElevatedButton(
-              onPressed: () {}, // Handled by pinput onCompleted
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue,
-                padding: const EdgeInsets.all(16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ElevatedButton(
+                onPressed: () {}, // Handled by pinput onCompleted
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[600],
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 18),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
+                ),
+                child: Text(
+                  "Continuer", 
+                  style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.w700)
+                ),
               ),
-              child: Text("Continuer", style: GoogleFonts.inter(fontWeight: FontWeight.w700)),
-            ),
-          ],
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

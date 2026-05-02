@@ -14,48 +14,58 @@ class RoleSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Choisissez votre rôle",
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Colors.grey[700],
-          ),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: UserRole.values.map((role) {
-            final isSelected = selectedRole == role;
-            return GestureDetector(
+    return Row(
+      children: UserRole.values.map((role) {
+        final isSelected = selectedRole == role;
+        return Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(
+              right: role == UserRole.values.last ? 0 : 8,
+            ),
+            child: InkWell(
               onTap: () => onRoleSelected(role),
+              borderRadius: BorderRadius.circular(12),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                duration: const Duration(milliseconds: 250),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.blue.withValues(alpha: 0.1) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(20),
+                  color: isSelected ? Colors.blue[600] : const Color(0xFFF8F9FB),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? Colors.blue : Colors.grey[300]!,
+                    color: isSelected ? Colors.blue[600]! : Colors.grey[200]!,
                     width: 1.5,
                   ),
+                  boxShadow: isSelected 
+                    ? [BoxShadow(color: Colors.blue.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 4))]
+                    : [],
                 ),
                 child: Text(
-                  role.name,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    color: isSelected ? Colors.blue : Colors.grey[600],
+                  _getRoleName(role),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color: isSelected ? Colors.white : Colors.grey[600],
                   ),
                 ),
               ),
-            );
-          }).toList(),
-        ),
-      ],
+            ),
+          ),
+        );
+      }).toList(),
     );
+  }
+
+  String _getRoleName(UserRole role) {
+    switch (role) {
+      case UserRole.TENANT:
+        return "Locataire";
+      case UserRole.OWNER:
+        return "Propriétaire";
+      case UserRole.BAYEUR:
+        return "Bayeur";
+      case UserRole.TECHNICIAN:
+        return "Technicien";
+    }
   }
 }
